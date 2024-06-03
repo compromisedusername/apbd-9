@@ -6,17 +6,10 @@ using WebApplication1.Services;
 
 namespace WebApplication1.Repositories;
 
-public class TripsRepository : ITripsRepository
+public class TripsRepository : BaseRepository, ITripsRepository
 {
-    private readonly ScaffoldContext _context;
 
-    public TripsRepository(ScaffoldContext context)
-    {
-        _context = context;
-    }
-
-
-    public async Task<PageDTO> GetPagingInfo(int pageSize, int page)
+    public async Task<PageDTO> GetPagingInfo(int page, int pageSize)
     {
         var totalTrips = await _context.Trips.CountAsync();
         
@@ -33,11 +26,6 @@ public class TripsRepository : ITripsRepository
     
     public async Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize)
     {
-        var totalTrips = await _context.Trips.CountAsync();
-        
-        var allPages = (int)Math.Ceiling(totalTrips / (double)pageSize);
-
-        
         var trips = await _context.Trips.Select(e => new TripDTO()
             {
                 Name = e.Name,
@@ -60,5 +48,8 @@ public class TripsRepository : ITripsRepository
         return trips;
     }
 
-    
+
+    public TripsRepository(ScaffoldContext context) : base(context)
+    {
+    }
 }
