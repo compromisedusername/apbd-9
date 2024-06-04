@@ -23,10 +23,12 @@ public class ClientsController : ControllerBase
         _clientService = clientService;
     }
 
-    [HttpDelete("{idClient}:int")]
-    public async Task<IActionResult> deleteClient(int idClient)
+    [HttpDelete("{idClient:int}")]
+    public async Task<IActionResult> DeleteClient(int idClient, CancellationToken cancellationToken)
     {
-        return Ok(await _clientService.DeleteClient(idClient));
+            return Ok(new { DeletedClient = await _clientService.DeleteClient(idClient, cancellationToken) });
     }
+
+   
 }
 

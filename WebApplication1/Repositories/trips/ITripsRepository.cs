@@ -4,9 +4,12 @@ using WebApplication1.Models;
 namespace WebApplication1.Repositories;
 
 public interface ITripsRepository
+
 {
-    public Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize);
-    public Task<PageDTO> GetPagingInfo(int pageSize, int page);
+     Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize, CancellationToken cancellationToken);
+     Task<PageDTO> GetPagingInfo(int pageSize, int page, CancellationToken cancellationToken);
 
 
+     Task<bool> IsTripInFutureAndExists(int dataIdTrip, CancellationToken cancellationToken);
+     Task<bool> IsTripPaidByClient(int dataIdTrip, string dataPesel, CancellationToken cancellationToken);
 }

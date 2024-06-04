@@ -9,9 +9,9 @@ namespace WebApplication1.Repositories;
 public class TripsRepository : BaseRepository, ITripsRepository
 {
 
-    public async Task<PageDTO> GetPagingInfo(int page, int pageSize)
+    public async Task<PageDTO> GetPagingInfo(int page, int pageSize, CancellationToken cancellationToken)
     {
-        var totalTrips = await _context.Trips.CountAsync();
+        var totalTrips = await _unitOfWork.Context.Trips.CountAsync(cancellationToken);
         
         var allPages = (int)Math.Ceiling(totalTrips / (double)pageSize);
 
@@ -22,11 +22,22 @@ public class TripsRepository : BaseRepository, ITripsRepository
             PageNum = page
         };
     }
-    
-    
-    public async Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize)
+
+    public async Task<bool> IsTripInFutureAndExists(int dataIdTrip, CancellationToken cancellationToken)
     {
-        var trips = await _context.Trips.Select(e => new TripDTO()
+        return await _unitOfWork.Context.Trips.AnyAsync(e => e.DateFrom >= DateTime.Now && e.IdTrip == dataIdTrip, cancellationToken);
+    }
+
+    public async Task<bool> IsTripPaidByClient(int dataIdTrip, string dataPesel, CancellationToken cancellationToken)
+    {
+        return await _unitOfWork.Context.ClientTrips.AnyAsync(e =>
+            e.IdClientNavigation.Pesel.Equals(dataPesel) && e.IdTrip == dataIdTrip && e.PaymentDate != null, cancellationToken);
+    }
+
+
+    public async Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize, CancellationToken cancellationToken)
+    {
+        var trips = await _unitOfWork.Context.Trips.Select(e => new TripDTO()
             {
                 Name = e.Name,
                 DateFrom = e.DateFrom,
@@ -43,13 +54,14 @@ public class TripsRepository : BaseRepository, ITripsRepository
             .Skip((page-1) * pageSize)
             .Take(pageSize)
             .OrderBy(e=>e.DateFrom)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return trips;
     }
 
 
-    public TripsRepository(ScaffoldContext context) : base(context)
+    public TripsRepository( IUnitOfWork unitOfWork) : base(unitOfWork)
     {
+        _unitOfWork = unitOfWork;
     }
 }

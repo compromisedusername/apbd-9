@@ -5,7 +5,9 @@ namespace WebApplication1.Services;
 
 public interface ITripsService
 {
-    public Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize);
-    public Task<PageDTO> GetPagingInfo(int page, int pageSize);
+     Task<IEnumerable<TripDTO>> GetTrips(int page, int pageSize, CancellationToken cancellationToken);
+     Task<PageDTO> GetPagingInfo(int page, int pageSize, CancellationToken cancellationToken);
+
+     Task<int> AssignClientToTrip(RequestAssignClientTrip data, CancellationToken cancellationToken);
 
 }

@@ -4,10 +4,12 @@ namespace WebApplication1.Repositories;
 
 public class BaseRepository
 {
-    protected readonly ScaffoldContext _context;
+  
+    protected IUnitOfWork _unitOfWork;
 
-    public BaseRepository(ScaffoldContext context)
+
+    public BaseRepository(IUnitOfWork unitOfWork)
     {
-        _context = context;
+        _unitOfWork = unitOfWork;
     }
 }
